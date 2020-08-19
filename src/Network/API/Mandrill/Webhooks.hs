@@ -31,20 +31,15 @@ data EventHook = EventSent
     deriving (Ord, Eq)
 
 instance Show EventHook where
-  show e = case e of
-    EventSent         -> "send"
-    EventDeferred     -> "deferral"
-    EventSoftBounced  -> "soft_bounce"
-    EventHardBounced  -> "hard_bounce"
-    EventOpened       -> "open"
-    EventClicked      -> "click"
-    EventMarkedAsSpam -> "spam"
-    EventUnsubscribed -> "unsub"
-    EventRejected     -> "reject"
+  show e = maybe (error "not-found") T.unpack . lookup e $ mandrillEvts'
+
 instance FromJSON EventHook where
   parseJSON (String s) =
     let sanitised = T.toLower s
-        err = fail $ "Unable to parse mandrill event: " ++ T.unpack sanitised ++ ", expected one of: " ++ show mandrillEvts
+        err = fail $ "Unable to parse mandrill event: "
+              <> T.unpack sanitised
+              <> ", expected one of: "
+              <> show (snd <$> mandrillEvts)
     in maybe err pure . lookup sanitised $ mandrillEvts
   parseJSON val = typeMismatch "String" val
 
@@ -60,6 +55,9 @@ mandrillEvts =
     , ("reject"      , EventRejected)
     , ("unsub"       , EventUnsubscribed)
     ]
+
+mandrillEvts' :: [(EventHook, T.Text)]
+mandrillEvts' = (\(a, b) -> (b, a)) <$> mandrillEvts
 
 instance ToJSON EventHook where
   toJSON = String . T.pack . show
