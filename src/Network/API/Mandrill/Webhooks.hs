@@ -43,19 +43,23 @@ instance Show EventHook where
     EventRejected     -> "reject"
 instance FromJSON EventHook where
   parseJSON (String s) =
-    case T.toLower s of
-      "send"        -> pure EventSent
-      "deferral"    -> pure EventDeferred
-      "soft_bounce" -> pure EventSoftBounced
-      "hard_bounce" -> pure EventHardBounced
-      "open"        -> pure EventOpened
-      "click"       -> pure EventClicked
-      "spam"        -> pure EventMarkedAsSpam
-      "reject"      -> pure EventRejected
-      "unsub"       -> pure EventUnsubscribed
-      x             -> fail ("can't parse " ++  show x)
+    let sanitised = T.toLower s
+        err = fail $ "Unable to parse mandrill event: " ++ T.unpack sanitised ++ ", expected one of: " ++ show mandrillEvts
+    in maybe err pure . lookup sanitised $ mandrillEvts
   parseJSON val = typeMismatch "String" val
 
+mandrillEvts :: [(T.Text, EventHook)]
+mandrillEvts =
+    [  ("send"        , EventSent)
+    , ("deferral"    , EventDeferred)
+    , ("soft_bounce" , EventSoftBounced)
+    , ("hard_bounce" , EventHardBounced)
+    , ("open"        , EventOpened)
+    , ("click"       , EventClicked)
+    , ("spam"        , EventMarkedAsSpam)
+    , ("reject"      , EventRejected)
+    , ("unsub"       , EventUnsubscribed)
+    ]
 
 instance ToJSON EventHook where
   toJSON = String . T.pack . show
