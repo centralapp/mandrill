@@ -5,3 +5,4 @@ shell.nix
 .stack-work
 tags
 dist*
+/TAGS

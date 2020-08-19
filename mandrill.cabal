@@ -56,7 +56,7 @@ library
     Haskell2010
 
   ghc-options:
-    -funbox-strict-fields
+    -funbox-strict-fields -Wall
 
 test-suite mandrill-tests
   type:

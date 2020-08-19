@@ -1,9 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Network.API.Mandrill.HTTP where
 
-import           Control.Applicative
 import           Data.Aeson
-import           Data.Monoid
 import qualified Data.Text                     as T
 import           Network.API.Mandrill.Settings
 import           Network.API.Mandrill.Types
@@ -29,5 +27,5 @@ toMandrillResponse ep rq mbMgr = do
   mgr <- maybe (newManager tlsManagerSettings) return mbMgr
   res <- responseBody <$> httpLbs req mgr
   case eitherDecode res of
-    Left e ->  fail e
+    Left e  ->  fail e
     Right v -> return v
