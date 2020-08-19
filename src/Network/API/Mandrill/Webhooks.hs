@@ -58,7 +58,7 @@ instance FromJSON EventHook where
 
 
 instance ToJSON EventHook where
-  toJSON e = String (T.pack $ show e)
+  toJSON = String . T.pack . show
 
 data WebhookAddRq = WebhookAddRq
     { _warq_key         :: MandrillKey
