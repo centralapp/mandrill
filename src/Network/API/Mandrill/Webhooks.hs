@@ -50,7 +50,7 @@ instance FromJSON EventHook where
 
 mandrillEvts :: [(T.Text, EventHook)]
 mandrillEvts =
-    [  ("send"        , EventSent)
+    [ ("send"        , EventSent)
     , ("deferral"    , EventDeferred)
     , ("soft_bounce" , EventSoftBounced)
     , ("hard_bounce" , EventHardBounced)
