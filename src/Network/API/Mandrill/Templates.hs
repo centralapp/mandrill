@@ -11,4 +11,4 @@ import           Network.API.Mandrill.Types
 import           Network.HTTP.Client
 
 getTemplates :: MandrillKey -> Maybe Label -> Maybe Manager -> IO (MandrillResponse [TemplatesResponse])
-getTemplates k labelFilt = toMandrillResponse GetTemplates (GetTemplatesRq k labelFilt)
+getTemplates k labelFilt = toMandrillResponse GetTemplates $ GetTemplatesRq k labelFilt
