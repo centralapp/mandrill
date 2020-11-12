@@ -15,15 +15,19 @@ toMandrillResponse :: (MandrillEndpoint ep, FromJSON a, ToJSON rq)
                    -> Maybe Manager
                    -> IO (MandrillResponse a)
 toMandrillResponse ep rq mbMgr = do
+
   let fullUrl = mandrillUrl <> toUrl ep
+      headers = [(hContentType, "application/json")]
+      jsonBody = encode rq
+
   rq' <- parseRequest (T.unpack fullUrl)
-  let headers = [(hContentType, "application/json")]
-  let jsonBody = encode rq
+
   let req = rq' {
         method = "POST"
       , requestHeaders = headers
       , requestBody = RequestBodyLBS jsonBody
       }
+
   mgr <- maybe (newManager tlsManagerSettings) return mbMgr
   res <- responseBody <$> httpLbs req mgr
   case eitherDecode res of

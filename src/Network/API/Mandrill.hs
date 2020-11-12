@@ -22,9 +22,7 @@ module Network.API.Mandrill (
   ) where
 
 import           Control.Monad.Reader
-import qualified Data.Aeson                          as JSON
 import qualified Data.HashMap.Strict                 as H
-import           Data.Monoid
 import qualified Data.Text                           as T
 import           Data.Time
 import           Network.API.Mandrill.Messages       as M
@@ -122,7 +120,7 @@ newTemplateMessage f t subj = (emptyMessage (Just f) t) { _mmsg_subject = Just s
 
 --------------------------------------------------------------------------------
 -- | Create a new template message (no HTML) with recipient addresses only.
--- This function is preferred when the template being used has the sender 
+-- This function is preferred when the template being used has the sender
 -- address and subject already configured in the Mandrill server.
 newTemplateMessage' :: [EmailAddress]
                     -- ^ Receivers email
