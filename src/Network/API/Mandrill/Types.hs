@@ -2,6 +2,7 @@
 {-# LANGUAGE DeriveFoldable      #-}
 {-# LANGUAGE DeriveFunctor       #-}
 {-# LANGUAGE DeriveTraversable   #-}
+{-# LANGUAGE DerivingVia         #-}
 {-# LANGUAGE OverloadedStrings   #-}
 {-# LANGUAGE RankNTypes          #-}
 {-# LANGUAGE ScopedTypeVariables #-}
@@ -10,6 +11,7 @@ module Network.API.Mandrill.Types where
 
 import           Data.Char
 import           Data.Maybe
+import           Data.String                   (IsString)
 import           Data.Time
 import           Lens.Micro.TH                 (makeLenses)
 import           Network.API.Mandrill.Utils
@@ -363,7 +365,8 @@ deriveJSON defaultOptions { fieldLabelModifier = drop 5 } ''MandrillTemplateCont
 
 --------------------------------------------------------------------------------
 type MandrillKey = T.Text
-type MandrillTemplate = T.Text
+newtype MandrillTemplate = MandrillTemplate T.Text
+                         deriving (Eq, Show, IsString, ToJSON, FromJSON) via T.Text
 
 newtype MandrillDate = MandrillDate {
   fromMandrillDate :: UTCTime
