@@ -1,7 +1,12 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Network.API.Mandrill.Settings where
+module Network.API.Mandrill.Settings
+  ( MandrillCalls(..)
+  , mandrillUrl
+  , MandrillEndpoint(..)
+  )
+where
 
-import qualified Data.Text as T
+import qualified Data.Text                     as T
 
 mandrillUrl :: T.Text
 mandrillUrl = "https://mandrillapp.com/api/1.0/"
@@ -21,6 +26,7 @@ data MandrillCalls =
   | DomainsAdd
   -- Senders API
   | VerifyDomain
+  | GetTemplates
 
   deriving Show
 
@@ -38,3 +44,4 @@ instance MandrillEndpoint MandrillCalls where
   toUrl DomainsAdd           = "inbound/add-domain.json"
   toUrl RoutesAdd            = "inbound/add-route.json"
   toUrl VerifyDomain         = "senders/verify-domain.json"
+  toUrl GetTemplates         = "templates/list.json"
