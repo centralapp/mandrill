@@ -1,5 +1,7 @@
 module Network.API.Mandrill.Templates
   ( getTemplates
+  -- * Re-exports.
+  , module Network.API.Mandrill.Templates.Types
   ) where
 
 import           Network.API.Mandrill.HTTP
