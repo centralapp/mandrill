@@ -27,7 +27,7 @@ deriveJSON defaultOptions { fieldLabelModifier = drop 6 } ''MessagesSendRq
 --------------------------------------------------------------------------------
 data MessagesSendTemplateRq = MessagesSendTemplateRq
     { _mstrq_key              :: MandrillKey
-    , _mstrq_template_name    :: T.Text
+    , _mstrq_template_name    :: MandrillTemplate
     , _mstrq_template_content :: [MandrillTemplateContent]
     , _mstrq_message          :: MandrillMessage
     , _mstrq_async            :: Maybe Bool

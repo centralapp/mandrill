@@ -1,11 +1,10 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 module Network.API.Mandrill.Trans where
 
-import Control.Monad.Reader
-import Control.Applicative
-import Network.API.Mandrill.Types
-import Network.HTTP.Client
-import Network.HTTP.Client.TLS
+import           Control.Monad.Reader
+import           Network.API.Mandrill.Types
+import           Network.HTTP.Client
+import           Network.HTTP.Client.TLS
 
 
 --------------------------------------------------------------------------------
