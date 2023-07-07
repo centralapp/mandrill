@@ -1,19 +1,31 @@
+args@
+  { sources ? import ./nix/sources.nix
+  , optimize ? false
+  , haddocks ? false
+  , failOnWarnings ? true
+  , ...
+  }:
 self: super:
 let
-  hlib = super.haskell.lib;
-  lib = super.lib;
-  # Filter the source based on the gitignore file. The path is the source path,
-  # in which the gitignore should reside under `.gitignore`.
-  gitignore = path:
-    super.nix-gitignore.gitignoreSourcePure [ (path + /.gitignore) ] path;
+  inherit (super.haskell.lib)
+    disableOptimization dontHaddock doJailbreak dontCheck appendConfigureFlag
+    markUnbroken;
+  inherit (super.lib) id pipe gitignore composeExtensions mapAttrs;
+  doFailOnWarnings = x: appendConfigureFlag x "--ghc-option=-Werror";
 
-  mandrillOverrides = selfh: superh: {
-    mandrill = hlib.dontHaddock
+  modPackage = package:
+    pipe package [
+      (if optimize then id else disableOptimization)
+      (if haddocks then id else dontHaddock)
+      (if failOnWarnings then doFailOnWarnings else id)
+    ];
+
+  overrides = selfh: superh: {
+    mandrill = modPackage
       (superh.callCabal2nix "mandrill" (gitignore ./.) { });
   };
 in {
   haskellPackages = super.haskellPackages.override (old: {
-    overrides = lib.composeExtensions (old.overrides or (_: _: { }))
-      mandrillOverrides;
+    overrides = composeExtensions (old.overrides or (_: _: { })) overrides;
   });
 }

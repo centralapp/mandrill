@@ -4,5 +4,6 @@ cabal.sandbox.config
 shell.nix
 .stack-work
 tags
-dist*
+dist-newstyle
 /TAGS
+result*
