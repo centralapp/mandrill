@@ -31,7 +31,6 @@ import qualified Data.ByteString.Base64        as Base64
 import           Data.Foldable
 import           Data.Traversable
 #endif
-import qualified Data.HashMap.Strict           as H
 import qualified Data.Text                     as T
 import qualified Data.Text.Encoding            as TL
 import qualified Data.Text.Lazy                as TL

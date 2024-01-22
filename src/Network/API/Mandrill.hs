@@ -22,7 +22,6 @@ module Network.API.Mandrill (
   ) where
 
 import           Control.Monad.Reader
-import qualified Data.HashMap.Strict                 as H
 import qualified Data.Text                           as T
 import           Data.Time
 import           Network.API.Mandrill.Messages       as M
