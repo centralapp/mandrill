@@ -6,3 +6,4 @@ tags
 dist-newstyle
 /TAGS
 result*
+/.direnv/
