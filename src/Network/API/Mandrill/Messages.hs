@@ -1,7 +1,11 @@
 
-module Network.API.Mandrill.Messages where
+module Network.API.Mandrill.Messages
+  ( send
+  , sendTemplate
+  )
+where
 
-import qualified Data.Text                           as T
+import qualified Data.Text                     as T
 import           Data.Time
 import           Network.API.Mandrill.HTTP
 import           Network.API.Mandrill.Messages.Types

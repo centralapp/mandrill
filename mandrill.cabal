@@ -25,6 +25,8 @@ library
     Network.API.Mandrill.Users.Types
     Network.API.Mandrill.Messages
     Network.API.Mandrill.Messages.Types
+    Network.API.Mandrill.Templates
+    Network.API.Mandrill.Templates.Types
     Network.API.Mandrill.Inbound
     Network.API.Mandrill.Webhooks
     Network.API.Mandrill.Senders
@@ -41,7 +43,7 @@ library
     , http-types >= 0.8.0
     , http-client >= 0.3.0
     , http-client-tls >= 0.2.0.0
-    , aeson >= 0.7.0.3 && < 1.5.0.0
+    , aeson 
     , microlens-th >= 0.4.0.0
     , blaze-html >= 0.5.0.0
     , QuickCheck >= 2.6 && < 3.0
@@ -56,7 +58,7 @@ library
     Haskell2010
 
   ghc-options:
-    -funbox-strict-fields
+    -funbox-strict-fields -Wall
 
 test-suite mandrill-tests
   type:

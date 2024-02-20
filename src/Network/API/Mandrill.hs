@@ -22,9 +22,6 @@ module Network.API.Mandrill (
   ) where
 
 import           Control.Monad.Reader
-import qualified Data.Aeson                          as JSON
-import qualified Data.HashMap.Strict                 as H
-import           Data.Monoid
 import qualified Data.Text                           as T
 import           Data.Time
 import           Network.API.Mandrill.Messages       as M
@@ -67,7 +64,7 @@ emptyMessage f t = MandrillMessage {
  , _mmsg_from_email = MandrillEmail <$> f
  , _mmsg_from_name = Nothing
  , _mmsg_to = map newRecipient t
- , _mmsg_headers = H.empty
+ , _mmsg_headers = mempty
  , _mmsg_important = Nothing
  , _mmsg_track_opens = Nothing
  , _mmsg_track_clicks = Nothing
@@ -88,7 +85,7 @@ emptyMessage f t = MandrillMessage {
  , _mmsg_subaccount = Nothing
  , _mmsg_google_analytics_domains = []
  , _mmsg_google_analytics_campaign = Nothing
- , _mmsg_metadata = H.empty
+ , _mmsg_metadata = mempty
  , _mmsg_recipient_metadata = []
  , _mmsg_attachments = []
  , _mmsg_images = []
@@ -122,7 +119,7 @@ newTemplateMessage f t subj = (emptyMessage (Just f) t) { _mmsg_subject = Just s
 
 --------------------------------------------------------------------------------
 -- | Create a new template message (no HTML) with recipient addresses only.
--- This function is preferred when the template being used has the sender 
+-- This function is preferred when the template being used has the sender
 -- address and subject already configured in the Mandrill server.
 newTemplateMessage' :: [EmailAddress]
                     -- ^ Receivers email

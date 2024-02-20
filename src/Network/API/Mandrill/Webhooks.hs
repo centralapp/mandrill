@@ -1,70 +1,74 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell   #-}
-module Network.API.Mandrill.Webhooks where
-import           Control.Applicative           (pure)
-import           Control.Monad                 (mzero)
-import           Data.Aeson                    (FromJSON, ToJSON, parseJSON,
-                                                toJSON)
-import           Data.Aeson                    (Value (String))
-import           Data.Aeson.TH                 (defaultOptions, deriveJSON)
-import           Data.Aeson.Types              (fieldLabelModifier)
-import           Data.Set                      (Set)
-import           Data.Text                     (Text)
-import qualified Data.Text                     as T
-import           Lens.Micro.TH                 (makeLenses)
-import           Network.API.Mandrill.HTTP     (toMandrillResponse)
-import           Network.API.Mandrill.Settings
-import           Network.API.Mandrill.Types
-import           Network.HTTP.Client           (Manager)
+module Network.API.Mandrill.Webhooks( EventHook(..)
+                                    , WebhookAddRq(..)
+                                    , warq_key
+                                    , warq_url
+                                    , warq_description
+                                    , warq_events
+                                    ) where
 
-data EventHook
-  = EventSent
-  | EventDeferred
-  | EventHardBounced
-  | EventSoftBounced
-  | EventOpened
-  | EventClicked
-  | EventMarkedAsSpam
-  | EventUnsubscribed
-  | EventRejected
-  deriving (Ord,Eq)
+import           Control.Applicative        (pure)
+import           Data.Aeson                 (FromJSON, ToJSON, Value (String),
+                                             parseJSON, toJSON)
+import           Data.Aeson.TH              (defaultOptions, deriveJSON)
+import           Data.Aeson.Types           (fieldLabelModifier, typeMismatch)
+import           Data.Set                   (Set)
+import           Data.Text                  (Text)
+import qualified Data.Text                  as T
+import           Lens.Micro.TH              (makeLenses)
+import           Network.API.Mandrill.Types
+
+data EventHook = EventSent
+    | EventDeferred
+    | EventHardBounced
+    | EventSoftBounced
+    | EventOpened
+    | EventClicked
+    | EventMarkedAsSpam
+    | EventUnsubscribed
+    | EventRejected
+    deriving (Ord, Eq)
 
 instance Show EventHook where
-  show e = case e of
-    EventSent         -> "send"
-    EventDeferred     -> "deferral"
-    EventSoftBounced  -> "soft_bounce"
-    EventHardBounced  -> "hard_bounce"
-    EventOpened       -> "open"
-    EventClicked      -> "click"
-    EventMarkedAsSpam -> "spam"
-    EventUnsubscribed -> "unsub"
-    EventRejected     -> "reject"
+  show e = maybe (error "not-found") T.unpack . lookup e $ mandrillEvts'
+
 instance FromJSON EventHook where
   parseJSON (String s) =
-    case s of
-      "send"           -> pure EventSent
-      "deferral"       -> pure EventDeferred
-      "soft_bounce"    -> pure EventSoftBounced
-      "hard_bounce"    -> pure EventHardBounced
-      "open"           -> pure EventOpened
-      "click"          -> pure EventClicked
-      "spam"           -> pure EventMarkedAsSpam
-      "reject"         -> pure EventRejected
-      "unsub"          -> pure EventUnsubscribed
-      x                -> fail ("can't parse " ++  show x)
+    let sanitised = T.toLower s
+        err = fail $ "Unable to parse mandrill event: "
+              <> T.unpack sanitised
+              <> ", expected one of: "
+              <> show (snd <$> mandrillEvts)
+    in maybe err pure . lookup sanitised $ mandrillEvts
+  parseJSON val = typeMismatch "String" val
 
+mandrillEvts :: [(T.Text, EventHook)]
+mandrillEvts =
+    [ ("send"        , EventSent)
+    , ("deferral"    , EventDeferred)
+    , ("soft_bounce" , EventSoftBounced)
+    , ("hard_bounce" , EventHardBounced)
+    , ("open"        , EventOpened)
+    , ("click"       , EventClicked)
+    , ("spam"        , EventMarkedAsSpam)
+    , ("reject"      , EventRejected)
+    , ("unsub"       , EventUnsubscribed)
+    ]
+
+mandrillEvts' :: [(EventHook, T.Text)]
+mandrillEvts' = (\(a, b) -> (b, a)) <$> mandrillEvts
 
 instance ToJSON EventHook where
-  toJSON e = String (T.pack $ show e)
+  toJSON = String . T.pack . show
 
-data WebhookAddRq =
-  WebhookAddRq
-  { _warq_key         :: MandrillKey
-  , _warq_url         :: Text
-  , _warq_description :: Text
-  , _warq_events      :: Set EventHook
-  } deriving Show
+data WebhookAddRq = WebhookAddRq
+    { _warq_key         :: MandrillKey
+    , _warq_url         :: Text
+    , _warq_description :: Text
+    , _warq_events      :: Set EventHook
+    }
+    deriving Show
 
 makeLenses ''WebhookAddRq
 deriveJSON defaultOptions { fieldLabelModifier = drop 6 } ''WebhookAddRq
