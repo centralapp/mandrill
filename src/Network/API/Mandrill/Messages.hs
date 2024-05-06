@@ -2,6 +2,7 @@
 module Network.API.Mandrill.Messages
   ( send
   , sendTemplate
+  , sendTemplateMod
   )
 where
 
@@ -46,4 +47,27 @@ sendTemplate :: MandrillKey
              -- ^ send_at
              -> Maybe Manager
              -> IO (MandrillResponse [MessagesResponse])
-sendTemplate k template content msg async ip_pool send_at = toMandrillResponse MessagesSendTemplate (MessagesSendTemplateRq k template content msg async ip_pool send_at)
+sendTemplate = sendTemplateMod id
+
+{- | Send a new transactional message through Mandrill using a template. The first parameter
+allows us to modify the 'Request' before it's sent, for example to add headers.
+-}
+sendTemplateMod :: (Request -> Request)
+                -> MandrillKey
+                -- ^ The API key
+                -> MandrillTemplate
+                -- ^ The template name
+                -> [MandrillTemplateContent]
+                -- ^ Template content for 'editable regions'
+                -> MandrillMessage
+                -- ^ The email message
+                -> Maybe Bool
+                -- ^ Enable a background sending mode that is optimized for bulk sending
+                -> Maybe T.Text
+                -- ^ ip_pool
+                -> Maybe UTCTime
+                -- ^ send_at
+                -> Maybe Manager
+                -> IO (MandrillResponse [MessagesResponse])
+sendTemplateMod modR k template content msg async ip_pool send_at =
+  toMandrillResponseMod modR MessagesSendTemplate (MessagesSendTemplateRq k template content msg async ip_pool send_at)

@@ -14,7 +14,20 @@ toMandrillResponse :: (MandrillEndpoint ep, FromJSON a, ToJSON rq)
                    -> rq
                    -> Maybe Manager
                    -> IO (MandrillResponse a)
-toMandrillResponse ep rq mbMgr = do
+toMandrillResponse = toMandrillResponseMod id
+
+{- | This function allows us to modify the 'Request' after we construct it from the url and JSON body.
+
+Note that the function is applied _after_ the request is constructed, so be careful about modifications
+that change existing parameters. E.g. it's better to _prepend_ to the list of headers than to override them.
+-}
+toMandrillResponseMod :: (MandrillEndpoint ep, FromJSON a, ToJSON rq)
+                      => (Request -> Request)
+                      -> ep
+                      -> rq
+                      -> Maybe Manager
+                      -> IO (MandrillResponse a)
+toMandrillResponseMod modR ep rq mbMgr = do
 
   let fullUrl = mandrillUrl <> toUrl ep
       headers = [(hContentType, "application/json")]
@@ -22,11 +35,11 @@ toMandrillResponse ep rq mbMgr = do
 
   rq' <- parseRequest (T.unpack fullUrl)
 
-  let req = rq' {
+  let req = modR (rq' {
         method = "POST"
       , requestHeaders = headers
       , requestBody = RequestBodyLBS jsonBody
-      }
+      })
 
   mgr <- maybe (newManager tlsManagerSettings) return mbMgr
   res <- responseBody <$> httpLbs req mgr
